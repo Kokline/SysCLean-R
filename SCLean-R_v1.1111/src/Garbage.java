@@ -1,7 +1,7 @@
 
 public class Garbage {
-	public char ativo;
 	public int id;
+	public char ativo;
 	public String descricao;
 	public float peso;
 	public String tipo;
