@@ -1,5 +1,6 @@
 public class Person {
 	//PERSONAL
+	public char active;
 	public String nome;
 	public String sobrenome;
 	public String cpf; //UTILIZADO COMO CHAVE PRIMÁRIA
@@ -8,7 +9,7 @@ public class Person {
     //ADDRESS
     public String rua, numero, cep, bairro, cidade, estado;
 	//CHAR
-	public char genero, active;
+	public char genero;
 	//DATES
     public String dataNascimento, dataRegistro;
 }

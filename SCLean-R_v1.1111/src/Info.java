@@ -1,114 +1,188 @@
 public class Info 
 {
-	public static boolean keyVerify(String key, String type) {
-		boolean checked = true;
-		Person[] person = null;
-		
-		if(type.equals("C")) { person = Load.loadCustomers(); }
-		else if(type.equals("W")) { person = Load.loadWorkers(); }
-		
-		for (int i = 0; i < person.length; i++) {
-			if(key.equals(person[i].cpf)) {
-				checked = false;
-			}
-		}
-		
-		return checked;
-	}
-	//-----------------------------------------------------------------------------------------------------------
-	
-	
-	static String[] titulos = { "ID:-------------- ",
-								"NOME:------------ ", 
-								"PESO:------------ ", 
-								"TIPO:------------ ", 
-								"STATUS:---------- ", 
-								"CATEGORIA:------- ",
-								"DATA DE REGISTRO: "};
-	
-	/*
-	 * TIPO R->Reciclavel | NR->Não Reciclavel
-	 * STATUS I->incinerar, V->venda
-	 */
-	
-	//colunas:-----------ID | NOME | PESO | TIPO | STATUS | CATEGORIA
-	static String[][] table = {	{"1", "Y", "Latas", "20", "R", "V", "Metais", "05/09/18 12:40"}, 
-								{"2", "Y", "Papelão", "0.95", "R", "I", "Papeis", "02/10/18 18:51"}, 
-								{"3", "Y", "Papel carbono", "2", "NR", "V", "Papeis", "15/09/18 13:23"}, 
-								{"4", "Y", "Garrafas de bebidas", "485", "R", "V", "Vidros", "06/10/18 18:51"}, 
-								{"5", "Y", "Cabos de panela", "130", "NR", "I", "Plásticos", "05/10/18 19:51"},
-								{"6", "Y", "Pilhas", "931.8", "NR", "V", "Metais", "06/10/18 18:51"},
-								{"7", "Y", "Adesivos", "193", "NR", "I", "Papeis", "05/10/18 12:35"},
-								{"8", "Y", "Potes de alimentos", "39", "R", "V", "Plásticos", "15/09/18 23:40"},
-								{"9", "Y", "Ferragens", "2380", "R", "V", "Metais", "06/10/18 18:55"},
-								{"10", "Y", "Revistas", "995.15", "R", "V", "Papeis", "06/10/18 18:59"}, 
-								{"11", "N", "Jornal", "75.0", "R", "I", "Papeis", "29/10/18 16:26"} };
-	
-	public static void listarInfoLixo(int opc) 
+	// PESO PARA CÁLCULO ESTATÍSTICO
+	public static void informWeight(String[][] table) 
 	{
-		/*
-		 * 1 -> "" - MOSTRAR TODOS
-		 * R  - MOSTRAR RECICLAVEIS
-		 * NR - MOSTRAR NÃO RECICLAVEIS
-		 */
-		String info = "", tipo = "";
-
-		if(opc == 2) { tipo = "R"; }
-		else if(opc == 3){ tipo = "NR"; }
-		else { tipo = ""; }
+		float weight[] = new float[11];
+		
+		// MODELO EXEMPLO ARRAY
+		/*		 0  |   1    |    2   |   3  |   4  |   5    |     6     |      7
+		 * 		 ID | ACTIVE |  NOME  | PESO | TIPO | STATUS | CATEGORIA | DATA REGISTRO
+			   { "1",  "Y",   "Latas",  "20",  "NR",   "V",    "Metais",  "05/09/18 12:40"},
+		*/
+		
+		//PARAMETRO VÁLIDOS
+				/*
+				 * "" - CALCULAR P/ TODOS -> LIVRE NA ESTRURURA DE REPETIÇÃO
+				 * 
+				 * TIPO-------------------------- / --> POS 4 ARRAY
+				 * R  - CALCULAR RECICLAVEIS
+				 * NR - CALCULAR NÃO RECICLAVEIS
+				 * 
+				 * STATUS------------------------ / --> POS 5 ARRAY
+				 * I  - CALCULAR P/ INCINERADOR
+				 * V  - CALCULAR P/ VENDAS
+				 * 
+				 * CATEGORIA--------------------- / --> POS 6 ARRAY
+				 * Plásticos  - CALCULAR P/ PLÁSTICO
+				 * Vidros 	  - CALCULAR P/ VIDRO
+				 * Metais	  - CALCULAR P/ METAL
+				 * Papeis 	  - CALCULAR P/ PAPEL
+				 * Orgânicos  - CALCULAR P/ ORGÂNICO
+				 * Borracha	  - CALCULAR P/ BORRACHA
+				 */
 		
 		for (int i = 0; i < table.length; i++) {
-			for (int j = 0; j < 8; j++) {
-				
-				if(tipo.equals(""))
-					info += titulos[j] + table[i][j] + "\n";
-				
-				else if(tipo.equals(table[i][3]))
-					info += titulos[j] + table[i][j] + "\n";
-			}
-			info += "\n";
-		}
-		
-		System.out.print(info);
-	}
-	
-	public static float infoPeso(String which) 
-	{
-		float peso = 0;
-		
-		if(which.equals("O")) which = "Orgânicos";
-		else if(which.equals("PP")) which = "Papeis";
-		else if(which.equals("P")) which = "Plásticos";
-		else if(which.equals("VI")) which = "Vidros";
-		else if(which.equals("M")) which = "Metais";
-		
-		for (int i = 0; i < table.length; i++) {
-			for (int j = 0; j < 6; j++) 
+			// TODOS - TODOS OS PESOS REGISTRADOS NA MATRIZ
+			weight[0] += Float.parseFloat(table[i][3]);
+			
+			for (int j = 0; j < 8; j++) 
 			{
-				switch (j) {
-				case 2:
-					//POR TIPO
-					if(which.equals(table[i][3]))
-						peso += Float.parseFloat(table[i][2]);
-					//TODOS
-					else if(which.equals("")) 
-						peso += Float.parseFloat(table[i][2]);
+				// POR TIPO - POSIÇÃO i4 DA MATRIZ
+				if(j == 4) {
+					if(table[i][4].equals("NR"))
+						weight[1] += Float.parseFloat(table[i][3]);
+					else if(table[i][4].equals("R"))
+						weight[2] += Float.parseFloat(table[i][3]);
 					
-					//POR STATUS
-					if(which.equals(table[i][4]))
-						peso += Float.parseFloat(table[i][2]);
-					
-					//POR CATEGORIA
-					if(which.equals(table[i][5]))
-						peso += Float.parseFloat(table[i][2]);
-					break;
-
-				default:
-					break;
+				}
+				// POR STATUS - POSIÇÃO i5 DA MATRIZ
+				else if(j == 5) {
+					if(table[i][5].equals("I"))
+						weight[3] += Float.parseFloat(table[i][3]);
+					else if(table[i][5].equals("V"))
+						weight[4] += Float.parseFloat(table[i][3]);
+				}
+				// POR CATEGORIA - POSIÇÃO i6 DA MATRIZ
+				else if(j == 6) {
+					if(table[i][6].equals("Orgânicos"))
+						weight[5] += Float.parseFloat(table[i][3]);
+					else if(table[i][6].equals("Papeis"))
+						weight[6] += Float.parseFloat(table[i][3]);
+					else if(table[i][6].equals("Plásticos"))
+						weight[7] += Float.parseFloat(table[i][3]);
+					else if(table[i][6].equals("Vidros"))
+						weight[8] += Float.parseFloat(table[i][3]);
+					else if(table[i][6].equals("Metais"))
+						weight[9] += Float.parseFloat(table[i][3]);
+					else if(table[i][6].equals("Borracha"))
+						weight[10] += Float.parseFloat(table[i][3]);
 				}
 			}
 		}
 		
-		return peso;
+		Printer.get_statistics_weight(weight);
+		informDate(table);
+		
+		getFinancialStatistics(weight);
+	}
+	
+	// DATAS PARA CÁLCULO ESTATÍSTICO
+	public static void informDate(String[][] table) 
+	{
+		float monthsWeight[] = new float[12];
+		int month = 0;
+		
+		for (int i = 0; i < table.length; i++) {
+			month = Ltp2Utils.getMonth(table[i][7]);
+			
+			//System.out.println(month);
+
+			if(month == 1)	
+				monthsWeight[0] += Float.parseFloat(table[i][3]);
+			else if(month == 2)
+				monthsWeight[1] += Float.parseFloat(table[i][3]);
+			else if(month == 3)
+				monthsWeight[2] += Float.parseFloat(table[i][3]);
+			else if(month == 4)
+				monthsWeight[3] += Float.parseFloat(table[i][3]);
+			else if(month == 5)
+				monthsWeight[4] += Float.parseFloat(table[i][3]);
+			else if(month == 6)
+				monthsWeight[5] += Float.parseFloat(table[i][3]);
+			else if(month == 7)
+				monthsWeight[6] += Float.parseFloat(table[i][3]);
+			else if(month == 8)
+				monthsWeight[7] += Float.parseFloat(table[i][3]);
+			else if(month == 9)
+				monthsWeight[8] += Float.parseFloat(table[i][3]);
+			else if(month == 10)
+				monthsWeight[9] += Float.parseFloat(table[i][3]);
+			else if(month == 11)
+				monthsWeight[10] += Float.parseFloat(table[i][3]);
+			else 
+				monthsWeight[11] += Float.parseFloat(table[i][3]);
+		}
+		
+		get_statisticsPerMonth_weight(monthsWeight);
+	}
+	
+	static String months[] = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+	
+	public static void get_statisticsPerMonth_weight(float[] weight) 
+	{	
+		String results = "";
+		
+		for (int i = 0; i < weight.length; i++) {
+			if(weight[i] != 0) {
+				results += "Mês de " + months[i] + " ----- " +Ltp2Utils.masWeight(weight[i]) + " de Lixo Recolhido\n";
+			}
+		}
+		
+		Printer.print_statisticsPerMonth_weight(results);
+	}
+	
+	// ESTATÍSTICA FINANCEIRA
+	public static void getFinancialStatistics(float[] weight) 
+	{	
+		/*
+		Medias de valores em R$ - Kg
+
+		0,41 papel
+		0,53 plástico
+		1,25 vidro
+		2,65 metal
+		0,25 borracha
+		*/
+		
+		float[] values = new float[5];
+
+		float total = 0;
+		
+		values[0] = weight[6] * (float)0.41;
+		values[1] = weight[7] * (float)0.53;
+		values[2] = weight[8] * (float)1.25;
+		values[3] = weight[9] * (float)2.65;
+		values[4] = weight[10] * (float)0.25;
+				
+		for (int i = 0; i < values.length; i++) { total += values[i]; }
+				
+		Printer.printFinancialStatistics(values, total);
+	}
+	
+	/*
+	 * --------------------------------------------------------------------------------------------------
+	 * CALCULATING VALUES FOR SALES----------------------------------------------------------------------
+	 * --------------------------------------------------------------------------------------------------
+	 */
+	
+	public static float calcSale(String category, float weight) 
+	{
+		float price = 0; 
+		/*
+		1 - Borracha 0,25 Borracha
+	 	2 - Metal 	 2,65 Metais
+		3 - Papel 	 0,41 Papeis
+		4 - Plastico 0,53 Plásticos
+		5 - Vidro 	 1,25 Vidros
+		 */
+		
+		if(category.equals("Borracha")) { price = weight * (float)0.25; }
+		else if(category.equals("Metais")) { price = weight * (float)2.65; }
+		else if(category.equals("Papeis")) { price = weight * (float)0.41; }
+		else if(category.equals("Plásticos")) { price = weight * (float)0.53; }
+		else if(category.equals("Vidros")) { price = weight * (float)1.25; }
+		
+		return price;
 	}
 }
